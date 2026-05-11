@@ -262,7 +262,7 @@
 
         function renderAll() {
             if (!currentInvestor) { window.location.href = 'login-investor.html'; return; }
-            document.getElementById('welcomeText').textContent = 'Selamat Datang, ' + currentInvestor.name;
+            document.getElementById('welcomeText').textContent = 'Selamat Datang, ' + (currentInvestor.fullname || currentInvestor.name || 'Investor');
             renderBeli();
             renderPorto();
             updateSummary();

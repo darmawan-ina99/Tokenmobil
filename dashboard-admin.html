@@ -626,7 +626,7 @@
             investors.forEach((inv, index) => {
                 const row = `
                     <tr>
-                        <td>${inv.name}</td>
+                        <td>${inv.fullname || inv.name}</td>
                         <td>${inv.email}</td>
                         <td>${inv.hp}</td>
                         <td>${inv.buktiTransfer ? `<a href="${inv.buktiTransfer}" target="_blank">Lihat Bukti</a>` : '-'}</td>

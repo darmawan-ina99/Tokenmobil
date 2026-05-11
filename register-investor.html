@@ -1,1 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Investor - PT Suksestama Automobil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root { --navy: #0a1f3b; --gold: #d4a017; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1f3b 0%, #0d2b4e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            bottom: -40px;
+            right: -60px;
+            width: 400px;
+            height: 200px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><path d="M30 130 L50 100 L100 100 L120 80 L280 80 L300 100 L350 100 L370 130 L380 130 L380 150 L20 150 Z" fill="%23d4a017" opacity="0.1"/></svg>') no-repeat;
+            background-size: contain;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .register-container {
+            background: #fff;
+            padding: 45px 35px;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            width: 400px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .register-container .icon-user-plus { font-size: 55px; color: var(--gold); margin-bottom: 10px; }
+        .register-container h2 { color: var(--navy); margin-bottom: 5px; font-size: 22px; }
+        .register-container .company { color: var(--gold); font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .register-container .jargon { color: #888; font-size: 13px; font-style: italic; margin-bottom: 25px; }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 6px; color: #333; font-size: 14px; }
+        .form-group input { width: 100%; padding: 13px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; transition: 0.3s; }
+        .form-group input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,160,23,0.15); }
+        .btn-register { width: 100%; padding: 14px; background: var(--gold); color: var(--navy); border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-register:hover { background: #e6b800; }
+        .error-msg { color: #c62828; font-size: 13px; margin-top: 10px; display: none; }
+        .login-link { margin-top: 15px; font-size: 13px; color: #666; }
+        .login-link a { color: var(--gold); font-weight: bold; text-decoration: none; }
+        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 13px; }
+        .back-link:hover { color: var(--navy); }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="icon-user-plus"><i class="fas fa-user-plus"></i></div>
+        <h2>Registrasi Investor</h2>
+        <div class="company">PT Suksestama Automobil</div>
+        <div class="jargon">" Pasti Untung dan Termurah "</div>
+        <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="fullname" placeholder="Masukkan nama lengkap">
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Masukkan email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Buat password">
+        </div>
+        <div class="form-group">
+            <label>Konfirmasi Password</label>
+            <input type="password" id="confirmPassword" placeholder="Konfirmasi password">
+        </div>
+        <button class="btn-register" onclick="registerInvestor()"><i class="fas fa-user-plus"></i> Daftar</button>
+        <p class="error-msg" id="errorMsg">Terjadi kesalahan saat registrasi.</p>
+        <div class="login-link">
+            Sudah punya akun? <a href="login-investor.html">Login di sini</a>
+        </div>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali ke Beranda</a>
+    </div>
+    <script>
+        function registerInvestor() {
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
 
+            if (!fullname || !email || !password || !confirmPassword) {
+                errorMsg.textContent = 'Semua kolom harus diisi!';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (password !== confirmPassword) {
+                errorMsg.textContent = 'Konfirmasi password tidak cocok!';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            if (password.length < 6) {
+                errorMsg.textContent = 'Password minimal 6 karakter!';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            let investors = JSON.parse(localStorage.getItem('investors') || '[]');
+            if (investors.some(i => i.email === email)) {
+                errorMsg.textContent = 'Email sudah terdaftar!';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            const newInvestor = {
+                id: investors.length > 0 ? Math.max(...investors.map(i => i.id)) + 1 : 1,
+                fullname: fullname,
+                email: email,
+                password: password, // In a real app, hash this password!
+                verified: false, // Investor needs to be verified by admin
+                balance: 0,
+                tokens: []
+            };
+            investors.push(newInvestor);
+            localStorage.setItem('investors', JSON.stringify(investors));
+
+            alert('Registrasi berhasil! Silakan tunggu verifikasi dari admin.');
+            window.location.href = 'login-investor.html';
+        }
+        document.addEventListener('keydown', function(e) { if (e.key === 'Enter') registerInvestor(); });
+    </script>
+</body>
+</html>
