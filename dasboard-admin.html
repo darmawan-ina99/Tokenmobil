@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - PT Suksestama Automobil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --navy: #0a1f3b;
+            --gold: #d4a017;
+            --silver: #c0c0c0;
+            --white: #ffffff;
+            --light-bg: #f5f5f5;
+            --metallic: #2c3e50;
+            --green: #0d7a3f;
+            --red: #c62828;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--navy) 0%, #0d2b4e 100%);
+            color: var(--white);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            border-right: 2px solid var(--gold);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar .logo i {
+            font-size: 36px;
+            color: var(--gold);
+        }
+
+        .sidebar .logo h3 {
+            font-size: 16px;
+            color: var(--gold);
+            margin-top: 8px;
+        }
+
+        .sidebar .logo p {
+            font-size: 10px;
+            color: var(--silver);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--silver);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background: rgba(212,160,23,0.2);
+            color: var(--gold);
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 25px;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e8e8e8;
+        }
+
+        .top-header h2 {
+            color: var(--navy);
+        }
+
+        .top-header button {
+            padding: 10px 20px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .top-header button:hover {
+            background: #a50e0e;
+        }
+
+        /* SUMMARY CARDS */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .summary-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .summary-card .icon.blue { background: #e8f0fe; color: var(--navy); }
+        .summary-card .icon.green { background: #e6f7ed; color: var(--green); }
+        .summary-card .icon.gold { background: #fffde7; color: var(--gold); }
+        .summary-card .icon.purple { background: #f3e8ff; color: #6a1b9a; }
+
+        .summary-card .info h4 {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .info p {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--navy);
+        }
+
+        /* TABLE SECTION */
+        .table-section {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-header h3 {
+            color: var(--navy);
+            font-size: 18px;
+        }
+
+        .table-header button {
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .table-header button:hover {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table thead th {
+            background: #f8f9fc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #444;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        table tbody td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-badge.active { background: #e6f7ed; color: var(--green); }
+        .status-badge.close { background: #ffeaea; color: var(--red); }
+        .status-badge.pending { background: #fff3e0; color: #e65100; }
+
+        .foto-kecil {
+            width: 50px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .foto-placeholder {
+            width: 50px;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        .aksi-btn {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 3px;
+            transition: 0.3s;
+        }
+
+        .aksi-btn:hover { background: #f0f0f0; }
+        .aksi-btn.verif { background: #e6f7ed; color: var(--green); border-color: var(--green); }
+        .aksi-btn.hapus { background: #ffeaea; color: var(--red); border-color: var(--red); }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .modal-content .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .modal-content .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            background: var(--gold);
+            color: var(--navy);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo h3, .sidebar .logo p, .sidebar ul li a span { display: none; }
+            .main-content { margin-left: 70px; }
+            .summary-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-car"></i>
+            <h3>Admin Panel</h3>
+            <p>PT Suksestama Automobil</p>
+        </div>
+        <ul>
+            <li><a href="#" class="active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+            <li><a href="#" onclick="showSection('units')"><i class="fas fa-car-side"></i> <span>Kelola Unit</span></a></li>
+            <li><a href="#" onclick="showSection('investors')"><i class="fas fa-users"></i> <span>Verifikasi Investor</span></a></li>
+            <li><a href="index.html"><i class="fas fa-home"></i> <span>Beranda</span></a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="top-header">
+            <h2>Dashboard Admin</h2>
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-cards" id="summaryCards">
+            <div class="summary-card">
+                <div class="icon blue"><i class="fas fa-car"></i></div>
+                <div class="info"><h4>Total Unit Aktif</h4><p id="totalUnit">0</p></div>
+            </div>
+            <div class="summary-card">
+                <div class="icon green"><i class="fas fa-coins"></i></div>
+                <div class="info"><h4>Total Token Terjual</h4><p id="totalToken">0</p></div>
+            </div>
+            <div class="summary-card">
+                <div class="icon gold"><i class="fas fa-hand-holding-usd"></i></div>
+                <div class="info"><h4>Dana Terkumpul</h4><p id="totalDana">Rp 0</p></div>
+            </div>
+            <div class="summary-card">
+                <div class="icon purple"><i class="fas fa-users"></i></div>
+                <div class="info"><h4>Investor Terverifikasi</h4><p id="totalInvestor">0</p></div>
+            </div>
+        </div>
+
+        <!-- SECTION: KELOLA UNIT -->
+        <div class="table-section" id="sectionUnits">
+            <div class="table-header">
+                <h3>🚗 Daftar Unit Kendaraan</h3>
+                <button onclick="openAddModal()"><i class="fas fa-plus"></i> Tambah Unit Baru</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Foto</th>
+                            <th>Nama Kendaraan</th>
+                            <th>Tahun</th>
+                            <th>Harga Beli</th>
+                            <th>Harga/Token</th>
+                            <th>Token Terjual</th>
+                            <th>Asumsi Jual</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unitTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION: VERIFIKASI INVESTOR -->
+        <div class="table-section" id="sectionInvestors" style="display:none;">
+            <div class="table-header">
+                <h3>👥 Verifikasi Investor Baru</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>HP</th>
+                        <th>Bukti Transfer</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="investorTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH UNIT -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3>Tambah Unit Baru</h3>
+            <div class="form-group"><label>Nama Kendaraan</label><input type="text" id="unitNama" placeholder="Contoh: Toyota Vellfire 2.4 AT"></div>
+            <div class="form-group"><label>Tahun</label><input type="number" id="unitTahun" placeholder="Contoh: 2011"></div>
+            <div class="form-group"><label>Harga Beli (Rp)</label><input type="number" id="unitHargaBeli" placeholder="Contoh: 108000000"></div>
+            <div class="form-group"><label>Jumlah Token (Maks 50)</label><input type="number" id="unitTotalToken" value="50" max="50"></div>
+            <div class="form-group"><label>Asumsi Harga Jual Terendah (Rp)</label><input type="number" id="unitAsumsiJual" placeholder="Contoh: 135000000"></div>
+            <div class="form-group"><label>Upload Foto</label><input type="file" id="unitFoto" accept="image/*"></div>
+            <button onclick="addUnit()">Simpan Unit</button>
+        </div>
+    </div>
+
+    <!-- HIDDEN FILE INPUT -->
+    <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;" onchange="handleEditFoto(event)">
+    <script>
+        let currentEditIndex = null;
+
+        function getUnits() {
+            let units = JSON.parse(localStorage.getItem('tokenUnits') || '[]');
+            if (units.length === 0) {
+                units = [
+                    { id: 1, nama: 'Toyota Vellfire 2.4 AT', tahun: 2011, hargaBeli: 108000000, totalToken: 50, tokenTerjual: 32, asumsiHargaJual: 135000000, status: 'active', foto: '', tanggalListing: '2025-05-01' },
+                    { id: 2, nama: 'Honda CR-V 1.5 Turbo', tahun: 2018, hargaBeli: 245000000, totalToken: 50, tokenTerjual: 18, asumsiHargaJual: 290000000, status: 'active', foto: '', tanggalListing: '2025-05-03' },
+                    { id: 3, nama: 'Mitsubishi Pajero Sport', tahun: 2020, hargaBeli: 320000000, totalToken: 50, tokenTerjual: 50, asumsiHargaJual: 380000000, status: 'close', foto: '', tanggalListing: '2025-04-20' }
+                ];
+                localStorage.setItem('tokenUnits', JSON.stringify(units));
+            }
+            return units;
+        }
+
+        function saveUnits(units) { localStorage.setItem('tokenUnits', JSON.stringify(units)); }
+
+        function renderUnitTable() {
+            const units = getUnits();
+            const tbody = document.getElementById('unitTableBody');
+            tbody.innerHTML = '';
+            units.forEach((unit, index) => {
+                const hargaPerToken = Math.ceil(unit.hargaBeli / unit.totalToken);
+                const fotoHtml = unit.foto
+                    ? `<img src="${unit.foto}" class="foto-kecil" onclick="window.open('${unit.foto}')">`
+                    : `<div class="foto-placeholder"><i class="fas fa-car"></i></div>`;
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${fotoHtml}</td>
+                        <td><strong>${unit.nama}</strong></td>
+                        <td>${unit.tahun}</td>
+                        <td>Rp ${unit.hargaBeli.toLocaleString('id-ID')}</td>
+                        <td>Rp ${hargaPerToken.toLocaleString('id-ID')}</td>
+                        <td>${unit.tokenTerjual}/${unit.totalToken}</td>
+                        <td>Rp ${unit.asumsiHargaJual.toLocaleString('id-ID')}</td>
+                        <td><span class="status-badge ${unit.status === 'active' ? 'active' : 'close'}">${unit.status === 'active' ? 'AKTIF' : 'CLOSE'}</span></td>
+                        <td>
+                            <button class="aksi-btn" onclick="editFoto(${index})" title="Upload Foto"><i class="fas fa-camera"></i></button>
+                            <button class="aksi-btn hapus" onclick="hapusUnit(${index})" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            updateSummary();
+        }
+
+        function editFoto(index) {
+            currentEditIndex = index;
+            document.getElementById('hiddenFileInput').click();
+        }
+
+        function handleEditFoto(event) {
+            const file = event.target.files[0];
+            if (file && currentEditIndex !== null) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const units = getUnits();
+                    units[currentEditIndex].foto = e.target.result;
+                    saveUnits(units);
+                    renderUnitTable();
+                    currentEditIndex = null;
+                };
+                reader.readAsDataURL(file);
+            }
+            event.target.value = '';
+        }
+
+        function hapusUnit(index) {
+            if (confirm('Hapus unit ini?')) {
+                const units = getUnits();
+                units.splice(index, 1);
+                saveUnits(units);
+                renderUnitTable();
+            }
+        }
+
+        function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('addModal').style.display = 'none'; }
+
+        function addUnit() {
+            const nama = document.getElementById('unitNama').value.trim();
+            const tahun = document.getElementById('unitTahun').value;
+            const hargaBeli = document.getElementById('unitHargaBeli').value;
+            const totalToken = document.getElementById('unitTotalToken').value;
+            const asumsiJual = document.getElementById('unitAsumsiJual').value;
+            const fileInput = document.getElementById('unitFoto');
+
+            if (!nama || !tahun || !hargaBeli || !totalToken || !asumsiJual) {
+                alert('Semua field harus diisi!');
+                return;
+            }
+
+            const units = getUnits();
+            const newUnit = {
+                id: Date.now(),
+                nama, tahun: parseInt(tahun), hargaBeli: parseInt(hargaBeli),
+                totalToken: parseInt(totalToken), tokenTerjual: 0,
+                asumsiHargaJual: parseInt(asumsiJual),
+                status: 'active', foto: '', tanggalListing: new Date().toISOString().split('T')[0]
+            };
+
+            if (fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newUnit.foto = e.target.result;
+                    units.push(newUnit);
+                    saveUnits(units);
+                    renderUnitTable();
+                    closeModal();
+                    clearForm();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                units.push(newUnit);
+                saveUnits(units);
+                renderUnitTable();
+                closeModal();
+                clearForm();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('unitNama').value = '';
+            document.getElementById('unitTahun').value = '';
+            document.getElementById('unitHargaBeli').value = '';
+            document.getElementById('unitTotalToken').value = '50';
+            document.getElementById('unitAsumsiJual').value = '';
+            document.getElementById('unitFoto').value = '';
+        }
+
+        function updateSummary() {
+            const units = getUnits();
+            const activeUnits = units.filter(u => u.status === 'active');
+            let totalTokenTerjual = 0, totalDana = 0;
+            units.forEach(u => {
+                totalTokenTerjual += u.tokenTerjual;
+                totalDana += u.tokenTerjual * Math.ceil(u.hargaBeli / u.totalToken);
+            });
+            let investors = JSON.parse(localStorage.getItem('investors') || '[]');
+            let verifiedInvestors = investors.filter(i => i.verified);
+
+            document.getElementById('totalUnit').textContent = activeUnits.length;
+            document.getElementById('totalToken').textContent = totalTokenTerjual;
+            document.getElementById('totalDana').textContent = 'Rp ' + totalDana.toLocaleString('id-ID');
+            document.getElementById('totalInvestor').textContent = verifiedInvestors.length;
+        }
+
+        function renderInvestorTable() {
+            let investors = JSON.parse(localStorage.getItem('investors') || '[]');
+            const tbody = document.getElementById('investorTableBody');
+            tbody.innerHTML = '';
+            investors.forEach((inv, index) => {
+                const row = `
+                    <tr>
+                        <td>${inv.name}</td>
+                        <td>${inv.email}</td>
+                        <td>${inv.hp}</td>
+                        <td>${inv.buktiTransfer ? `<a href="${inv.buktiTransfer}" target="_blank">Lihat Bukti</a>` : '-'}</td>
+                        <td><span class="status-badge ${inv.verified ? 'active' : 'pending'}">${inv.verified ? 'Terverifikasi' : 'Pending'}</span></td>
+                        <td>
+                            ${!inv.verified ? `<button class="aksi-btn verif" onclick="verifikasiInvestor(${index})"><i class="fas fa-check"></i> Verifikasi</button>` : '<span style="color:green;">✅</span>'}
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function verifikasiInvestor(index) {
+            let investors = JSON.parse(localStorage.getItem('investors') || '[]');
+            investors[index].verified = true;
+
+            // Beri gratis 1 token dari unit pertama yang aktif
+            if (!investors[index].freeTokenGiven) {
+                let units = getUnits();
+                let targetUnit = units.find(u => u.status === 'active' && u.tokenTerjual < u.totalToken);
+                if (targetUnit) {
+                    targetUnit.tokenTerjual += 1;
+                    saveUnits(units);
+                    investors[index].tokens = investors[index].tokens || [];
+                    investors[index].tokens.push({ unitId: targetUnit.id, nama: targetUnit.nama, jumlah: 1, hargaBeli: Math.ceil(targetUnit.hargaBeli / targetUnit.totalToken) });
+                    investors[index].freeTokenGiven = true;
+                }
+            }
+
+            localStorage.setItem('investors', JSON.stringify(investors));
+            renderInvestorTable();
+            renderUnitTable();
+            alert('Investor berhasil diverifikasi! Gratis 1 token telah diberikan.');
+        }
+
+        function showSection(section) {
+            document.getElementById('sectionUnits').style.display = section === 'units' ? 'block' : 'none';
+            document.getElementById('sectionInvestors').style.display = section === 'investors' ? 'block' : 'none';
+            if (section === 'investors') renderInvestorTable();
+        }
+
+        function logout() {
+            if (confirm('Yakin ingin logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Init
+        renderUnitTable();
+    </script>
+
+</body>
+</html>
