@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Tokenisasi Kendaraan - Darmawan & Partners</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* LOGIN PAGE */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2440 100%);
+        }
+
+        .login-box {
+            background: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 380px;
+            text-align: center;
+        }
+
+        .login-box .logo {
+            font-size: 40px;
+            color: #ffc107;
+            margin-bottom: 10px;
+        }
+
+        .login-box h2 {
+            margin-bottom: 5px;
+            color: #1e3a5f;
+        }
+
+        .login-box p {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .login-box input:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 3px rgba(255,193,7,0.2);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: #1e3a5f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-box button:hover {
+            background: #ffc107;
+            color: #1e3a5f;
+        }
+
+        .login-error {
+            color: #c62828;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1e3a5f 0%, #0f2440 100%);
+            color: #fff;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar .logo h3 {
+            font-size: 18px;
+            color: #ffc107;
+            margin-top: 5px;
+        }
+
+        .sidebar .logo p {
+            font-size: 11px;
+            color: #a0b4cc;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 12px 15px;
+            color: #c0d0e0;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background: rgba(255,255,255,0.1);
+            color: #ffc107;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 25px;
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .top-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-header .user-info button {
+            padding: 8px 16px;
+            background: #c62828;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .summary-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .summary-card .icon.blue { background: #e8f0fe; color: #1e3a5f; }
+        .summary-card .icon.green { background: #e6f7ed; color: #0d7a3f; }
+        .summary-card .icon.orange { background: #fff3e0; color: #e65100; }
+        .summary-card .icon.purple { background: #f3e8ff; color: #6a1b9a; }
+        .summary-card .info h4 { font-size: 13px; color: #888; margin-bottom: 5px; }
+        .summary-card .info p { font-size: 20px; font-weight: bold; color: #1e3a5f; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .chart-container,
+        .recent-activity {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .chart-container h3,
+        .recent-activity h3,
+        .table-section h3 {
+            margin-bottom: 15px;
+            color: #1e3a5f;
+            font-size: 16px;
+        }
+
+        .table-section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            margin-bottom: 25px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-header button {
+            background: #1e3a5f;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .table-header button:hover {
+            background: #ffc107;
+            color: #1e3a5f;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table thead th {
+            background: #f8f9fc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #444;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        table tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-badge.lengkap { background: #e6f7ed; color: #0d7a3f; }
+        .status-badge.belum { background: #ffeaea; color: #c62828; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ffc107;
+            border-radius: 10px;
+        }
+
+        .aksi-btn {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+            transition: 0.3s;
+        }
+
+        .aksi-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .aksi-btn.upload {
+            background: #e8f0fe;
+            color: #1e3a5f;
+            border-color: #1e3a5f;
+        }
+
+        .foto-kendaraan {
+            width: 60px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: 0.3s;
+        }
+
+        .foto-kendaraan:hover {
+            transform: scale(1.1);
+            border-color: #ffc107;
+        }
+
+        .foto-placeholder {
+            width: 60px;
+            height: 45px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 11px;
+        }
+
+        /* MODAL POPUP FOTO */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 12px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            color: #fff;
+            font-size: 40px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .logo h3,
+            .sidebar .logo p,
+            .sidebar ul li a span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== HALAMAN LOGIN ========== -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="logo"><i class="fas fa-car"></i></div>
+            <h2>Tokenisasi Kendaraan</h2>
+            <p>Darmawan & Partners</p>
+            <input type="text" id="username" placeholder="Username" value="">
+            <input type="password" id="password" placeholder="Password" value="">
+            <button onclick="login()"><i class="fas fa-sign-in-alt"></i> Masuk Dashboard</button>
+            <p class="login-error" id="loginError">Username atau password salah!</p>
+            <p style="margin-top: 15px; font-size: 11px; color: #aaa;">Default: admin / admin123</p>
+        </div>
+    </div>
+
+    <!-- ========== DASHBOARD (AWALNYA TERSEMBUNYI) ========== -->
+    <div id="dashboardPage" style="display: none; width: 100%;">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-car" style="font-size: 30px; color: #ffc107;"></i>
+                <h3>Tokenisasi</h3>
+                <p>Darmawan & Partners</p>
+            </div>
+            <ul>
+                <li><a href="#" class="active"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+                <li><a href="#"><i class="fas fa-car-side"></i> <span>Aset Kendaraan</span></a></li>
+                <li><a href="#"><i class="fas fa-users"></i> <span>Investor</span></a></li>
+                <li><a href="#"><i class="fas fa-exchange-alt"></i> <span>Transaksi</span></a></li>
+                <li><a href="#"><i class="fas fa-file-alt"></i> <span>Laporan</span></a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> <span>Pengaturan</span></a></li>
+            </ul>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            
+            <!-- HEADER -->
+            <div class="top-header">
+                <h2>Dashboard Admin</h2>
+                <div class="user-info">
+                    <span id="adminName">Admin</span>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </div>
+
+            <!-- RINGKASAN -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="icon blue"><i class="fas fa-coins"></i></div>
+                    <div class="info">
+                        <h4>Total Nilai Aset</h4>
+                        <p>Rp 5.200.000.000</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon green"><i class="fas fa-chart-pie"></i></div>
+                    <div class="info">
+                        <h4>Token Terjual</h4>
+                        <p>3,250 / 5,200</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon orange"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="info">
+                        <h4>Dana Terkumpul</h4>
+                        <p>Rp 3.250.000.000</p>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon purple"><i class="fas fa-user-check"></i></div>
+                    <div class="info">
+                        <h4>Investor Aktif</h4>
+                        <p>48 Orang</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRAFIK & AKTIVITAS -->
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <h3>Performa Tokenisasi (Bulanan)</h3>
+                    <canvas id="tokenChart" height="220"></canvas>
+                </div>
+                <div class="recent-activity">
+                    <h3>Aktivitas Terbaru</h3>
+                    <table style="font-size: 12px;">
+                        <tbody>
+                            <tr><td>✅ <strong>Vellfire 2011</strong> - 50 token terjual</td><td style="text-align:right; color:#888;">10 menit lalu</td></tr>
+                            <tr><td>📄 <strong>BPKB Honda CR-V</strong> - Dokumen lengkap</td><td style="text-align:right; color:#888;">1 jam lalu</td></tr>
+                            <tr><td>🔧 <strong>Perbaikan Avanza 2015</strong> - Rp 2.500.000</td><td style="text-align:right; color:#888;">3 jam lalu</td></tr>
+                            <tr><td>💰 <strong>Penarikan Dana</strong> - Investor Andi R. Rp 50.000.000</td><td style="text-align:right; color:#888;">5 jam lalu</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABEL UTAMA KENDARAAN + FOTO -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>🚗 Daftar Kendaraan & Status Tokenisasi</h3>
+                    <button onclick="tambahKendaraan()"><i class="fas fa-plus"></i> Tambah Kendaraan</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Foto</th>
+                                <th>Kendaraan</th>
+                                <th>Tahun</th>
+                                <th>Harga Beli</th>
+                                <th>Token/Unit</th>
+                                <th>Total Token</th>
+                                <th>Terjual</th>
+                                <th>Progress</th>
+                                <th>STNK</th>
+                                <th>BPKB</th>
+                                <th>Biaya Balik Nama</th>
+                                <th>Biaya Perbaikan</th>
+                                <th>Biaya Simpan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data diisi JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RINGKASAN BIAYA -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h3>📊 Ringkasan Biaya Operasional</h3>
+                    <button onclick="alert('Export data ke Excel (simulasi)')"><i class="fas fa-download"></i> Export</button>
+                </div>
+                <table class="biaya-table">
+                    <thead>
+                        <tr>
+                            <th>Jenis Biaya</th>
+                            <th>Total</th>
+                            <th>Rata-rata/Unit</th>
+                            <th>Kendaraan Terkait</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Balik Nama & Administrasi</td><td>Rp 12.500.000</td><td>Rp 2.500.000</td><td>5 unit</td></tr>
+                        <tr><td>Perbaikan & Servis</td><td>Rp 18.200.000</td><td>Rp 3.640.000</td><td>5 unit</td></tr>
+                        <tr><td>Penyimpanan & Parkir</td><td>Rp 3.000.000</td><td>Rp 600.000</td><td>5 unit</td></tr>
+                        <tr style="font-weight: bold; background: #f8f9fc;">
+                            <td>TOTAL BIAYA</td><td>Rp 33.700.000</td><td>Rp 6.740.000</td><td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL POPUP FOTO -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- HIDDEN FILE INPUT UNTUK UPLOAD -->
+    <input type="file" id="hiddenFileInput" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+
+    <script>
+        // ==========================================
+        // KONFIGURASI LOGIN
+        // ==========================================
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('loginError');
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboardPage').style.display = 'flex';
+                document.getElementById('adminName').textContent = username;
+                initDashboard();
+            } else {
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // Enter key untuk login
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
+                login();
+            }
+        });
+
+        // ==========================================
+        // DATA KENDARAAN (disimpan di localStorage)
+        // ==========================================
+        function getKendaraanData() {
+            const stored = localStorage.getItem('kendaraanData');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            // Default data awal
+            const defaultData = [
+                { no: 1, nama: 'Toyota Vellfire 2.4 AT', tahun: 2011, hargaBeli: 108682000, tokenUnit: 1000000, totalToken: 110, terjual: 50, stnk: true, bpkb: true, biayaBN: 2500000, biayaPerbaikan: 3500000, biayaSimpan: 600000, foto: '' },
+                { no: 2, nama: 'Honda CR-V 1.5 Turbo', tahun: 2018, hargaBeli: 245000000, tokenUnit: 5000000, totalToken: 50, terjual: 30, stnk: true, bpkb: false, biayaBN: 4000000, biayaPerbaikan: 2000000, biayaSimpan: 700000, foto: '' },
+                { no: 3, nama: 'Toyota Avanza 1.3 G', tahun: 2015, hargaBeli: 95000000, tokenUnit: 1000000, totalToken: 95, terjual: 80, stnk: false, bpkb: true, biayaBN: 1500000, biayaPerbaikan: 2800000, biayaSimpan: 500000, foto: '' },
+                { no: 4, nama: 'Mitsubishi Pajero Sport', tahun: 2020, hargaBeli: 320000000, tokenUnit: 10000000, totalToken: 32, terjual: 12, stnk: true, bpkb: true, biayaBN: 6000000, biayaPerbaikan: 5000000, biayaSimpan: 800000, foto: '' },
+                { no: 5, nama: 'Suzuki Carry Pick Up', tahun: 2019, hargaBeli: 78000000, tokenUnit: 500000, totalToken: 156, terjual: 90, stnk: true, bpkb: false, biayaBN: 1000000, biayaPerbaikan: 1500000, biayaSimpan: 400000, foto: '' },
+            ];
+            localStorage.setItem('kendaraanData', JSON.stringify(defaultData));
+            return defaultData;
+        }
+
+        function saveKendaraanData(data) {
+            localStorage.setItem('kendaraanData', JSON.stringify(data));
+        }
+
+        let currentEditIndex = null; // Untuk tracking upload foto
+
+        // ==========================================
+        // RENDER TABEL
+        // ==========================================
+        function renderTable() {
+            const data = getKendaraanData();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            data.forEach((item, index) => {
+                const progressPercent = Math.round((item.terjual / item.totalToken) * 100);
+                const fotoHtml = item.foto 
+                    ? `<img src="${item.foto}" class="foto-kendaraan" onclick="event.stopPropagation(); bukaModal('${item.foto}')" alt="Foto ${item.nama}">`
+                    : `<div class="foto-placeholder">No Foto</div>`;
+                
+                const row = `
+                    <tr>
+                        <td>${item.no}</td>
+                        <td>${fotoHtml}</td>
+                        <td><strong>${item.nama}</strong></td>
+                        <td>${item.tahun}</td>
+                        <td>Rp ${item.hargaBeli.toLocaleString('id-ID')}</td>
+                        <td>Rp ${item.tokenUnit.toLocaleString('id-ID')}</td>
+                        <td>${item.totalToken} Token</td>
+                        <td>${item.terjual} Token</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                            </div>
+                            <small>${progressPercent}%</small>
+                        </td>
+                        <td><span class="status-badge ${item.stnk ? 'lengkap' : 'belum'}">${item.stnk ? 'Lengkap' : 'Belum'}</span></td>
+                        <td><span class="status-badge ${item.bpkb ? 'lengkap' : 'belum'}">${item.bpkb ? 'Lengkap' : 'Belum'}</span></td>
+                        <td>Rp ${item.biayaBN.toLocaleString('id-ID')}</td>
+                        <td>Rp ${item.biayaPerbaikan.toLocaleString('id-ID')}</td>
+                        <td>Rp ${item.biayaSimpan.toLocaleString('id-ID')}</td>
+                        <td>
+                            <button class="aksi-btn upload" onclick="uploadFoto(${index})" title="Upload Foto"><i class="fas fa-camera"></i></button>
+                            <button class="aksi-btn" onclick="lihatDetail(${index})" title="Detail"><i class="fas fa-eye"></i></button>
+                            <button class="aksi-btn" onclick="hapusKendaraan(${index})" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // ==========================================
+        // UPLOAD FOTO
+        // ==========================================
+        function uploadFoto(index) {
+            currentEditIndex = index;
+            document.getElementById('hiddenFileInput').click();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file && currentEditIndex !== null) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const data = getKendaraanData();
+                    data[currentEditIndex].foto = e.target.result;
+                    saveKendaraanData(data);
+                    renderTable();
+                    currentEditIndex = null;
+                };
+                reader.readAsDataURL(file);
+            }
+            // Reset input
+            event.target.value = '';
+        }
+
+        // ==========================================
+        // MODAL POPUP FOTO
+        // ==========================================
+        function bukaModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // ==========================================
+        // AKSI LAINNYA
+        // ==========================================
+        function lihatDetail(index) {
+            const data = getKendaraanData();
+            const item = data[index];
+            alert(`Detail Kendaraan:\n\nNama: ${item.nama}\nTahun: ${item.tahun}\nHarga Beli: Rp ${item.hargaBeli.toLocaleString('id-ID')}\nToken Terjual: ${item.terjual}/${item.totalToken}\nSTNK: ${item.stnk ? 'Lengkap' : 'Belum'}\nBPKB: ${item.bpkb ? 'Lengkap' : 'Belum'}\nBiaya Balik Nama: Rp ${item.biayaBN.toLocaleString('id-ID')}\nBiaya Perbaikan: Rp ${item.biayaPerbaikan.toLocaleString('id-ID')}\nBiaya Simpan: Rp ${item.biayaSimpan.toLocaleString('id-ID')}`);
+        }
+
+        function hapusKendaraan(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus kendaraan ini?')) {
+                const data = getKendaraanData();
+                data.splice(index, 1);
+                // Update nomor urut
+                data.forEach((item, i) => { item.no = i + 1; });
+                saveKendaraanData(data);
+                renderTable();
+            }
+        }
+
+        function tambahKendaraan() {
+            const nama = prompt('Nama Kendaraan:');
+            if (!nama) return;
+            const tahun = prompt('Tahun:');
+            if (!tahun) return;
+            const hargaBeli = prompt('Harga Beli (angka saja):');
+            if (!hargaBeli) return;
+            const tokenUnit = prompt('Harga per Token (angka saja):');
+            if (!tokenUnit) return;
+            const totalToken = prompt('Total Token:');
+            if (!totalToken) return;
+
+            const data = getKendaraanData();
+            data.push({
+                no: data.length + 1,
+                nama: nama,
+                tahun: parseInt(tahun),
+                hargaBeli: parseInt(hargaBeli),
+                tokenUnit: parseInt(tokenUnit),
+                totalToken: parseInt(totalToken),
+                terjual: 0,
+                stnk: false,
+                bpkb: false,
+                biayaBN: 0,
+                biayaPerbaikan: 0,
+                biayaSimpan: 0,
+                foto: ''
+            });
+            saveKendaraanData(data);
+            renderTable();
+            alert('Kendaraan berhasil ditambahkan! Silakan lengkapi data dan upload foto.');
+        }
+
+        // ==========================================
+        // INIT DASHBOARD
+        // ==========================================
+        function initDashboard() {
+            renderTable();
+
+            // Grafik Chart.js
+            const ctx = document.getElementById('tokenChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [{
+                        label: 'Token Terjual',
+                        data: [450, 520, 680, 720, 810, 950],
+                        backgroundColor: '#ffc107',
+                        borderRadius: 6
+                    }, {
+                        label: 'Dana Masuk (juta Rp)',
+                        data: [320, 410, 550, 600, 700, 850],
+                        backgroundColor: '#1e3a5f',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, padding: 20 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f0f0f0' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
